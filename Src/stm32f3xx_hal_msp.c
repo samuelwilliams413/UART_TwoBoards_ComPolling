@@ -122,23 +122,31 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 */
 void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 {
-  GPIO_InitTypeDef          GPIO_InitStruct;
+	GPIO_InitTypeDef          GPIO_InitStruct_l;
+	GPIO_InitTypeDef          GPIO_InitStruct_r;
+
+
   static DMA_HandleTypeDef         DmaHandle;
 
   /*##-1- Enable peripherals and GPIO Clocks #################################*/
   /* Enable GPIO clock ****************************************/
   __HAL_RCC_GPIOA_CLK_ENABLE();
   /* ADC1 Periph clock enable */
-  ADCx_left_CLK_ENABLE();
+  ADCx_CLK_ENABLE();
   /* Enable DMA1 clock */
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /*##- 2- Configure peripheral GPIO #########################################*/
   /* ADC Channel GPIO pin configuration */
-  GPIO_InitStruct.Pin = ADCx_left_CHANNEL_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ADCx_left_CHANNEL_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct_l.Pin = GPIO_PIN_5;
+  GPIO_InitStruct_l.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct_l.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ADCx_CHANNEL_GPIO_PORT, &GPIO_InitStruct_l);
+
+    GPIO_InitStruct_r.Pin = GPIO_PIN_4;
+    GPIO_InitStruct_r.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct_r.Pull = GPIO_NOPULL;
+      HAL_GPIO_Init(ADCx_CHANNEL_GPIO_PORT, &GPIO_InitStruct_r);
   /*##- 3- Configure DMA #####################################################*/
 
   /*********************** Configure DMA parameters ***************************/
@@ -174,15 +182,16 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 {
 
   /*##-1- Reset peripherals ##################################################*/
-  ADCx_left_FORCE_RESET();
-  ADCx_left_RELEASE_RESET();
+  ADCx_FORCE_RESET();
+  ADCx_RELEASE_RESET();
   /* ADC Periph clock disable
    (automatically reset all ADC instances of the ADC common group) */
   __HAL_RCC_ADC12_CLK_DISABLE();
 
   /*##-2- Disable peripherals and GPIO Clocks ################################*/
   /* De-initialize the ADC Channel GPIO pin */
-  HAL_GPIO_DeInit(ADCx_left_CHANNEL_GPIO_PORT, ADCx_left_CHANNEL_PIN);
+  HAL_GPIO_DeInit(ADCx_CHANNEL_GPIO_PORT, GPIO_PIN_5);
+  HAL_GPIO_DeInit(ADCx_CHANNEL_GPIO_PORT, GPIO_PIN_4);
 }
 
 /**

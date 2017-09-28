@@ -38,6 +38,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "string.h"
+#include "stdlib.h"
 #include "stm32f3xx_hal_adc.h"
 #include "stm32f3xx_hal_adc_ex.h"
 
@@ -52,7 +54,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 //#define TRANSMITTER_BOARD
-/* Definition of ADCx_left conversions data table size */
+/* Definition of ADCx conversions data table size */
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  32)   /* Size of array */
 
 /* Private macro -------------------------------------------------------------*/
@@ -61,10 +63,12 @@
 ADC_HandleTypeDef AdcHandle;
 
 /* ADC channel configuration structure declaration */
-ADC_ChannelConfTypeDef sConfig;
+ADC_ChannelConfTypeDef sConfig_l;
+ADC_ChannelConfTypeDef sConfig_r;
 
 /* Variable containing ADC conversions data */
 static uint16_t aADCx_leftConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
+static uint16_t aADCx_rightConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
 uint32_t moving_average_X( uint32_t*, int);
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
@@ -94,6 +98,7 @@ int main(void) {
 	uint8_t* confirmBuffer = (uint8_t*) malloc (sizeof(uint8_t)*100);
 	memset(confirmBuffer, 0, 100);
 	int flicker = 0;
+	int i = 0;
 #ifdef TRANSMITTER_BOARD
 	GPIO_InitTypeDef GPIO_InitStruct;
 #endif
@@ -138,7 +143,7 @@ int main(void) {
 	}
 
 	/* ### - 1 - Initialize ADC peripheral #################################### */
-	AdcHandle.Instance = ADCx_left;
+	AdcHandle.Instance = ADCx;
 	if (HAL_ADC_DeInit(&AdcHandle) != HAL_OK) {
 		/* ADC de-initialization Error */
 		Error_Handler();
@@ -168,31 +173,35 @@ int main(void) {
 		Error_Handler();
 	}
 
-	/* ### - 3 - Channel configuration ######################################## */
-	sConfig.Channel = ADCx_left_CHANNEL; /* Sampled channel number */
-	sConfig.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
-	sConfig.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
-	sConfig.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
-	sConfig.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
-	sConfig.Offset = 0; /* Parameter discarded because offset correction is disabled */
-	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig) != HAL_OK) {
+
+	/* ### - 3 - Left Channel configuration ######################################## */
+	sConfig_l.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_l.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_l.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_l.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_l.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_l.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_l) != HAL_OK) {
 		Error_Handler();
 	}
+
+
+	/* ### - 3 - Right Channel configuration ######################################## */
+	sConfig_r.Channel = ADC_CHANNEL_1; /* Sampled channel number */
+	sConfig_r.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_r.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_r.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_r.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_r.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_r) != HAL_OK) {
+		Error_Handler();
+	}
+
 
 	/* ### - 4 - Start conversion in DMA mode ################################# */
 	if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
 		Error_Handler();
 	}
-
-
-	/* The board receives the message and sends it back */
-
-	/*##-2- Put UART peripheral in reception process ###########################*/
-	if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
-			1000) != HAL_OK) {
-		Error_Handler();
-	}
-	flicker = 49;
 
 	uint32_t ADCValue = 0;
 	uint32_t last_ADCValue;
@@ -205,16 +214,61 @@ int main(void) {
 
 	memset(confirmBuffer, 0, 100);
 
+	sprintf( confirmBuffer, "********* BOOT COMPLETED *********\n\r");
+
+	flicker = 0;
 	while (1) {
 		/*##-3- Start the transmission process #####################################*/
 		/* While the UART in reception process, user can transmit data through
 		 "aTxBuffer" buffer */
 		BSP_LED_Toggle(LED3);
 		HAL_Delay(100);
-		//aTxBuffer[0] = ((flicker++) % 128);
 		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
 				1000) != HAL_OK) {
 			Error_Handler();
+		}
+
+		if (index_measure == 0) {
+			memset(confirmBuffer, 0, 100);
+			number_measure = 0;
+
+			for(i = 0; i < 10; i++) {
+				moving_average[i] = 0;
+			}
+
+			if (flicker == 0) {
+				flicker = 1;
+				sprintf( confirmBuffer, ">>>LEFT\n\r");
+
+				if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
+					Error_Handler();
+				}
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_l) != HAL_OK) {
+					Error_Handler();
+				}
+				if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
+					Error_Handler();
+				}
+
+			} else {
+				flicker = 0;
+				sprintf( confirmBuffer, ">>>RIGHT\n\r");
+
+				if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
+					Error_Handler();
+				}
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_r) != HAL_OK) {
+					Error_Handler();
+				}
+				if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
+					Error_Handler();
+				}
+			}
+
+			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
+					1000) != HAL_OK) {
+				Error_Handler();
+			}
 		}
 
 		if (HAL_ADC_PollForConversion(&AdcHandle, 1000000) == HAL_OK) {
@@ -240,6 +294,8 @@ int main(void) {
 			memset(confirmBuffer, 0, 100);
 
 			sprintf( confirmBuffer, "V:%u\tA:%u\tD:%u\n\r", ADCValue, moving_average_val, diff_ADCValue);
+
+
 		}
 
 	}
