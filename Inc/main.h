@@ -46,23 +46,23 @@
 /* User can use this section to tailor USARTx/UARTx instance used and associated 
    resources */
 
-/* Definition for ADCx clock resources */
-#define ADCx                            ADC2
-#define ADCx_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
-#define ADCx_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
+/* Definition for ADCx_left clock resources */
+#define ADCx_left                            ADC2
+#define ADCx_left_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
+#define ADCx_left_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
 
 #define DMAx_CHANNELx_CLK_ENABLE()      __HAL_RCC_DMA1_CLK_ENABLE()
 
-#define ADCx_FORCE_RESET()              __HAL_RCC_ADC12_FORCE_RESET()
-#define ADCx_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
+#define ADCx_left_FORCE_RESET()              __HAL_RCC_ADC12_FORCE_RESET()
+#define ADCx_left_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
 
-/* Definition for ADCx Channel Pin */
-#define ADCx_CHANNEL_PIN_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define ADCx_CHANNEL_PIN                GPIO_PIN_4
-#define ADCx_CHANNEL_GPIO_PORT          GPIOA
+/* Definition for ADCx_left Channel Pin */
+#define ADCx_left_CHANNEL_PIN_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
+#define ADCx_left_CHANNEL_PIN                GPIO_PIN_4
+#define ADCx_left_CHANNEL_GPIO_PORT          GPIOA
 
-/* Definition for ADCx's Channel */
-#define ADCx_CHANNEL                    ADC_CHANNEL_1
+/* Definition for ADCx_left's Channel */
+#define ADCx_left_CHANNEL                    ADC_CHANNEL_1
 
 
 /* Definition for USARTx clock resources */

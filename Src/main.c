@@ -52,7 +52,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 //#define TRANSMITTER_BOARD
-/* Definition of ADCx conversions data table size */
+/* Definition of ADCx_left conversions data table size */
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  32)   /* Size of array */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,15 +64,14 @@ ADC_HandleTypeDef AdcHandle;
 ADC_ChannelConfTypeDef sConfig;
 
 /* Variable containing ADC conversions data */
-static uint16_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
+static uint16_t aADCx_leftConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
 uint32_t moving_average_X( uint32_t*, int);
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
 __IO uint32_t VirtualUserButtonStatus = 0; /* set to 1 after User set a button  */
 
 /* Buffer used for transmission */
-uint8_t aTxBuffer[] = "**** Reading? ****\n\r";
-uint8_t confirmBuffer[] = "GOT:______\n\r";
+uint8_t aTxBuffer[] = "                                                  \n\r";
 
 /* Buffer used for reception */
 uint8_t aRxBuffer[RXBUFFERSIZE];
@@ -91,6 +90,9 @@ static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2,
  * @retval None
  */
 int main(void) {
+
+	uint8_t* confirmBuffer = (uint8_t*) malloc (sizeof(uint8_t)*100);
+	memset(confirmBuffer, 0, 100);
 	int flicker = 0;
 #ifdef TRANSMITTER_BOARD
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -136,7 +138,7 @@ int main(void) {
 	}
 
 	/* ### - 1 - Initialize ADC peripheral #################################### */
-	AdcHandle.Instance = ADCx;
+	AdcHandle.Instance = ADCx_left;
 	if (HAL_ADC_DeInit(&AdcHandle) != HAL_OK) {
 		/* ADC de-initialization Error */
 		Error_Handler();
@@ -167,8 +169,8 @@ int main(void) {
 	}
 
 	/* ### - 3 - Channel configuration ######################################## */
-	sConfig.Channel = ADCx_CHANNEL; /* Sampled channel number */
-	sConfig.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_CHANNEL */
+	sConfig.Channel = ADCx_left_CHANNEL; /* Sampled channel number */
+	sConfig.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
 	sConfig.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
 	sConfig.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
 	sConfig.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
@@ -182,95 +184,6 @@ int main(void) {
 		Error_Handler();
 	}
 
-#ifdef TRANSMITTER_BOARD
-
-	/* Configure PA.12 (Arduino D2) button as input with External interrupt */
-	GPIO_InitStruct.Pin = GPIO_PIN_12;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-
-	/* Enable GPIOA clock */
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	/* Enable and set PA.12 (Arduino D2) button EXTI Interrupt to the lowest priority */
-	NVIC_SetPriority((IRQn_Type)(EXTI15_10_IRQn), 0x03);
-	HAL_NVIC_EnableIRQ((IRQn_Type)(EXTI15_10_IRQn));
-	/* Wait for the user to set GPIOA to GND before starting the Communication.
-	 In the meantime, LED3 is blinking */
-	//while(VirtualUserButtonStatus == 0)
-	//{
-	//    /* Toggle LED3*/
-	//    BSP_LED_Toggle(LED3);
-	//    HAL_Delay(100);
-	//
-	//}
-	if(HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 1000)!= HAL_OK)
-	{
-		Error_Handler();
-	}
-
-	flicker = 0;
-	while (flicker < 10) {
-		HAL_Delay(10);
-		flicker++;
-		BSP_LED_Toggle(LED3);
-	}
-
-	if(HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 1000)!= HAL_OK)
-	{
-		Error_Handler();
-	}
-
-	while (1) {
-		/*##-3- Start the transmission process #####################################*/
-		/* While the UART in reception process, user can transmit data through
-		 "aTxBuffer" buffer */
-
-		HAL_Delay(1000);
-
-		BSP_LED_Off(LED3);
-
-		/*##-3- Put UART peripheral in reception process ###########################*/
-		if(HAL_UART_Receive(&UartHandle, (uint8_t *)aRxBuffer, RXBUFFERSIZE, 0x1FFFFFF) != HAL_OK)
-		{
-			Error_Handler();
-		}
-
-		aRxBuffer[0] = ((flicker++)%128);
-		aRxBuffer[RXBUFFERSIZE-3] = '#';
-		aRxBuffer[RXBUFFERSIZE-2] = '\n';
-		aRxBuffer[RXBUFFERSIZE-1] = '\r';
-		if(HAL_UART_Transmit(&UartHandle, (uint8_t*)confirmBuffer, TXBUFFERSIZE, 1000)!= HAL_OK)
-		{
-			Error_Handler();
-		}
-		if(HAL_UART_Transmit(&UartHandle, (uint8_t*)aRxBuffer, RXBUFFERSIZE, 1000)!= HAL_OK)
-		{
-			Error_Handler();
-		}
-
-	}
-
-	BSP_LED_Off(LED3);
-	/* The board sends the message and expects to receive it back */
-
-	/*##-2- Start the transmission process #####################################*/
-	/* While the UART in reception process, user can transmit data through
-	 "aTxBuffer" buffer */
-	if(HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 5000)!= HAL_OK)
-	{
-		Error_Handler();
-	}
-
-	/*##-3- Put UART peripheral in reception process ###########################*/
-	if(HAL_UART_Receive(&UartHandle, (uint8_t *)aRxBuffer, RXBUFFERSIZE, 5000) != HAL_OK)
-	{
-		Error_Handler();
-	}
-
-#else
 
 	/* The board receives the message and sends it back */
 
@@ -289,6 +202,8 @@ int main(void) {
 	uint32_t* moving_average = (uint32_t*)malloc(sizeof(uint32_t) * 10);
 	int number_measure = 0;
 	int index_measure = 0;
+
+	memset(confirmBuffer, 0, 100);
 
 	while (1) {
 		/*##-3- Start the transmission process #####################################*/
@@ -322,22 +237,11 @@ int main(void) {
 			}
 
 			moving_average_val = moving_average_X(moving_average, number_measure);
+			memset(confirmBuffer, 0, 100);
+
 			sprintf( confirmBuffer, "V:%u\tA:%u\tD:%u\n\r", ADCValue, moving_average_val, diff_ADCValue);
 		}
 
-	}
-
-#endif /* TRANSMITTER_BOARD */
-
-	/*##-4- Compare the sent and received buffers ##############################*/
-	if (Buffercmp((uint8_t*) aTxBuffer, (uint8_t*) aRxBuffer, RXBUFFERSIZE)) {
-		Error_Handler();
-	}
-
-	/* Turn on LED3 if test passes then enter infinite loop */
-	BSP_LED_On(LED3);
-	/* Infinite loop */
-	while (1) {
 	}
 }
 
