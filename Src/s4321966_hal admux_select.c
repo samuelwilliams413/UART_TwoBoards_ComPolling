@@ -37,8 +37,8 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "s4321966_hal admux_select.h"
-#include "stm32f4xx_hal_conf.h"
+#include "main.h"
+
 
 
 /**
@@ -58,20 +58,12 @@ extern void s4322929_hal_ledbar_init(void) {
 	__BRD_D8_GPIO_CLK();
 
 	/* GPIO pins as outputs */
-	GPIO_InitStructure.Pin = BRD_D5_PIN;				//Pin
+	GPIO_InitStructure.Pin = LED3_PIN;;				//Pin
 	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;		//Output Mode
 	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
-	GPIO_InitStructure.Speed = GPIO_SPEED_FAST;			//Pin latency
-	HAL_GPIO_Init(BRD_D6_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;;			//Pin latency
+	HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStructure);
 
-	GPIO_InitStructure.Pin = BRD_D6_PIN;				//Pin
-	HAL_GPIO_Init(BRD_D7_GPIO_PORT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.Pin = BRD_D7_PIN;				//Pin
-	HAL_GPIO_Init(BRD_D7_GPIO_PORT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.Pin = BRD_D8_PIN;				//Pin
-	HAL_GPIO_Init(BRD_D5_GPIO_PORT, &GPIO_InitStructure);
 }
 
 

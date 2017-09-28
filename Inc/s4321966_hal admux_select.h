@@ -41,6 +41,8 @@
 #include "main.h"
 #include "stm32f3xx_hal.h"
 #include "stm32f3xx_nucleo_32.h"
+#include "stm32f4xx_hal_gpio.h"
+
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

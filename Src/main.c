@@ -38,7 +38,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "s4321966_hal admux_select.h"
 #include "string.h"
 #include "stdlib.h"
 #include "stm32f3xx_hal_adc.h"
@@ -57,6 +56,31 @@
 //#define TRANSMITTER_BOARD
 /* Definition of ADCx conversions data table size */
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  32)   /* Size of array */
+
+
+#define BRD_D6_PIN						GPIO_PIN_15
+#define BRD_D7_PIN						GPIO_PIN_2
+#define BRD_D8_PIN						GPIO_PIN_3
+#define BRD_D9_PIN						GPIO_PIN_18
+
+
+#define D6_GPIO_PORT                     GPIOB
+#define D7_GPIO_PORT                     GPIOF
+#define D8_GPIO_PORT                     GPIOF
+#define D9_GPIO_PORT                     GPIOA
+
+
+#define D6_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOB_CLK_ENABLE()
+#define D7_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOF_CLK_ENABLE()
+#define D8_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOF_CLK_ENABLE()
+#define D9_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOA_CLK_ENABLE()
+
+
+#define D6_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOB_CLK_DISABLE()
+#define D7_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOF_CLK_DISABLE()
+#define D8_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOF_CLK_DISABLE()
+#define D9_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOA_CLK_DISABLE()
+
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -100,9 +124,7 @@ int main(void) {
 	memset(confirmBuffer, 0, 100);
 	int flicker = 0;
 	int i = 0;
-#ifdef TRANSMITTER_BOARD
 	GPIO_InitTypeDef GPIO_InitStruct;
-#endif
 	/* STM32F3xx HAL library initialization:
 	 - Configure the Flash prefetch
 	 - Configure the Systick to generate an interrupt each 1 msec
@@ -116,6 +138,18 @@ int main(void) {
 
 	/* Configure LED3 */
 	BSP_LED_Init(LED3);
+
+
+	/* Enable the GPIO clocks */
+
+		/* GPIO pins as outputs */
+		GPIO_InitStruct.Pin = BRD_D6_PIN;				//Pin
+		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;		//Output Mode
+		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;;			//Pin latency
+		HAL_GPIO_Init(D6_GPIO_PORT, &GPIO_InitStruct);
+
+		HAL_GPIO_WritePin(D6_GPIO_PORT, BRD_D6_PIN, 0x00);
 
 	/*##-1- Configure the UART peripheral ######################################*/
 	/* Put the USART peripheral in the Asynchronous mode (UART Mode) */
