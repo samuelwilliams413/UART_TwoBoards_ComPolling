@@ -38,6 +38,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "s4321966_hal admux_select.h"
 #include "string.h"
 #include "stdlib.h"
 #include "stm32f3xx_hal_adc.h"
