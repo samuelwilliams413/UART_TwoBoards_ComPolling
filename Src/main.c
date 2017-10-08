@@ -38,6 +38,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "math.h"
 #include "string.h"
 #include "stdlib.h"
 #include "stm32f3xx_hal_adc.h"
@@ -241,6 +242,7 @@ int main(void) {
 	uint32_t ADCValue = 0;
 	uint32_t last_ADCValue;
 	uint32_t diff_ADCValue;
+	uint32_t X_v;
 
 	uint32_t moving_average_val;
 	uint32_t* moving_average = (uint32_t*)malloc(sizeof(uint32_t) * 10);
@@ -272,7 +274,7 @@ int main(void) {
 			}
 
 			if (flicker == 0) {
-				flicker = 1;
+				//flicker = 1;
 				sprintf( confirmBuffer, ">>>LEFT\n\r");
 
 				if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
@@ -328,13 +330,17 @@ int main(void) {
 			moving_average_val = moving_average_X(moving_average, number_measure);
 			memset(confirmBuffer, 0, 100);
 
-			sprintf( confirmBuffer, "V:%u\tA:%u\tD:%u\n\r", ADCValue, moving_average_val, diff_ADCValue);
+			X_v = (1/ADCValue)*1732.1 - 22.448;
+			X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
+
+			sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
 
 
 		}
 
 	}
 }
+
 
 uint32_t moving_average_X( uint32_t* moving_average, int X) {
 	uint32_t moving_average_val = 0;
