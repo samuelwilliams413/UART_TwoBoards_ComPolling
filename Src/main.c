@@ -274,7 +274,7 @@ int main(void) {
 			}
 
 			if (flicker == 0) {
-				//flicker = 1;
+				flicker = 1;
 				sprintf( confirmBuffer, ">>>LEFT\n\r");
 
 				if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
