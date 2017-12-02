@@ -215,7 +215,7 @@ int main(void) {
 
 
 	/* ### - 3 - a Channel configuration ######################################## */
-	sConfig_a.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_a.Channel = ADC_CHANNEL_1; /* Sampled channel number */
 	sConfig_a.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
 	sConfig_a.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
 	sConfig_a.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
@@ -239,7 +239,7 @@ int main(void) {
 
 
 	/* ### - 3 - c Channel configuration ######################################## */
-	sConfig_c.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_c.Channel = ADC_CHANNEL_3; /* Sampled channel number */
 	sConfig_c.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
 	sConfig_c.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
 	sConfig_c.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
@@ -251,7 +251,7 @@ int main(void) {
 
 
 	/* ### - 3 - d Channel configuration ######################################## */
-	sConfig_d.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_d.Channel = ADC_CHANNEL_4; /* Sampled channel number */
 	sConfig_d.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
 	sConfig_d.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
 	sConfig_d.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
@@ -311,7 +311,7 @@ int main(void) {
 		/* While the UART in reception process, user can transmit data through
 		 "aTxBuffer" buffer */
 		BSP_LED_Toggle(LED3);
-		HAL_Delay(50);
+		HAL_Delay(100);
 		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
 				1000) != HAL_OK) {
 			Error_Handler();
@@ -351,7 +351,7 @@ int main(void) {
 				break;
 			case 3:
 				sprintf( confirmBuffer, ">>>D\n\r");
-				flicker = 4;
+				flicker = 0;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_d) != HAL_OK) {
 					Error_Handler();
 				}
@@ -391,9 +391,9 @@ int main(void) {
 
 			number_measure = number_measure + 1;
 			index_measure = index_measure + 1;
-			index_measure = index_measure % 5;
-			if (number_measure > 5) {
-				number_measure = 5;
+			index_measure = index_measure % 10;
+			if (number_measure > 10) {
+				number_measure = 10;
 			}
 
 			if (last_ADCValue > ADCValue) {
