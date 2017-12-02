@@ -89,8 +89,12 @@
 ADC_HandleTypeDef AdcHandle;
 
 /* ADC channel configuration structure declaration */
-ADC_ChannelConfTypeDef sConfig_l;
-ADC_ChannelConfTypeDef sConfig_r;
+ADC_ChannelConfTypeDef sConfig_a;
+ADC_ChannelConfTypeDef sConfig_b;
+ADC_ChannelConfTypeDef sConfig_c;
+ADC_ChannelConfTypeDef sConfig_d;
+ADC_ChannelConfTypeDef sConfig_e;
+ADC_ChannelConfTypeDef sConfig_f;
 
 /* Variable containing ADC conversions data */
 static uint16_t aADCx_leftConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
@@ -210,26 +214,74 @@ int main(void) {
 	}
 
 
-	/* ### - 3 - Left Channel configuration ######################################## */
-	sConfig_l.Channel = ADC_CHANNEL_2; /* Sampled channel number */
-	sConfig_l.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
-	sConfig_l.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
-	sConfig_l.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
-	sConfig_l.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
-	sConfig_l.Offset = 0; /* Parameter discarded because offset correction is disabled */
-	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_l) != HAL_OK) {
+	/* ### - 3 - a Channel configuration ######################################## */
+	sConfig_a.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_a.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_a.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_a.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_a.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_a.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_a) != HAL_OK) {
 		Error_Handler();
 	}
 
 
-	/* ### - 3 - Right Channel configuration ######################################## */
-	sConfig_r.Channel = ADC_CHANNEL_1; /* Sampled channel number */
-	sConfig_r.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
-	sConfig_r.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
-	sConfig_r.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
-	sConfig_r.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
-	sConfig_r.Offset = 0; /* Parameter discarded because offset correction is disabled */
-	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_r) != HAL_OK) {
+	/* ### - 3 - b Channel configuration ######################################## */
+	sConfig_b.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_b.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_b.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_b.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_b.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_b.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_b) != HAL_OK) {
+		Error_Handler();
+	}
+
+
+	/* ### - 3 - c Channel configuration ######################################## */
+	sConfig_c.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_c.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_c.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_c.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_c.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_c.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_c) != HAL_OK) {
+		Error_Handler();
+	}
+
+
+	/* ### - 3 - d Channel configuration ######################################## */
+	sConfig_d.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_d.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_d.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_d.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_d.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_d.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_d) != HAL_OK) {
+		Error_Handler();
+	}
+
+
+	/* ### - 3 - e Channel configuration ######################################## */
+	sConfig_e.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_e.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_e.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_e.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_e.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_e.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_e) != HAL_OK) {
+		Error_Handler();
+	}
+
+
+	/* ### - 3 - f Channel configuration ######################################## */
+	sConfig_f.Channel = ADC_CHANNEL_1; /* Sampled channel number */
+	sConfig_f.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
+	sConfig_f.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
+	sConfig_f.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
+	sConfig_f.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
+	sConfig_f.Offset = 0; /* Parameter discarded because offset correction is disabled */
+	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_f) != HAL_OK) {
 		Error_Handler();
 	}
 
@@ -259,7 +311,7 @@ int main(void) {
 		/* While the UART in reception process, user can transmit data through
 		 "aTxBuffer" buffer */
 		BSP_LED_Toggle(LED3);
-		HAL_Delay(100);
+		HAL_Delay(50);
 		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
 				1000) != HAL_OK) {
 			Error_Handler();
@@ -272,35 +324,58 @@ int main(void) {
 			for(i = 0; i < 10; i++) {
 				moving_average[i] = 0;
 			}
-
-			if (flicker == 0) {
-				flicker = 1;
-				sprintf( confirmBuffer, ">>>LEFT\n\r");
-
-				if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
-					Error_Handler();
-				}
-				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_l) != HAL_OK) {
-					Error_Handler();
-				}
-				if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
-					Error_Handler();
-				}
-
-			} else {
-				flicker = 0;
-				sprintf( confirmBuffer, ">>>RIGHT\n\r");
-
-				if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
-					Error_Handler();
-				}
-				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_r) != HAL_OK) {
-					Error_Handler();
-				}
-				if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
-					Error_Handler();
-				}
+			if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
+				Error_Handler();
 			}
+			switch (flicker) {
+			case 0:
+				sprintf( confirmBuffer, ">>>A\n\r");
+				flicker = 1;
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_a) != HAL_OK) {
+					Error_Handler();
+				}
+				break;
+			case 1:
+				sprintf( confirmBuffer, ">>>B\n\r");
+				flicker = 2;
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_b) != HAL_OK) {
+					Error_Handler();
+				}
+				break;
+			case 2:
+				sprintf( confirmBuffer, ">>>C\n\r");
+				flicker = 3;
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_c) != HAL_OK) {
+					Error_Handler();
+				}
+				break;
+			case 3:
+				sprintf( confirmBuffer, ">>>D\n\r");
+				flicker = 4;
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_d) != HAL_OK) {
+					Error_Handler();
+				}
+				break;
+			case 4:
+				sprintf( confirmBuffer, ">>>E\n\r");
+				flicker = 5;
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_e) != HAL_OK) {
+					Error_Handler();
+				}
+				break;
+			case 5:
+				sprintf( confirmBuffer, ">>>F\n\r");
+				flicker = 0;
+				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_f) != HAL_OK) {
+					Error_Handler();
+				}
+				break;
+			}
+
+			if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
+				Error_Handler();
+			}
+
 
 			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
 					1000) != HAL_OK) {
@@ -316,9 +391,9 @@ int main(void) {
 
 			number_measure = number_measure + 1;
 			index_measure = index_measure + 1;
-			index_measure = index_measure % 10;
-			if (number_measure > 10) {
-				number_measure = 10;
+			index_measure = index_measure % 5;
+			if (number_measure > 5) {
+				number_measure = 5;
 			}
 
 			if (last_ADCValue > ADCValue) {
@@ -334,8 +409,6 @@ int main(void) {
 			X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
 
 			sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
-
-
 		}
 
 	}

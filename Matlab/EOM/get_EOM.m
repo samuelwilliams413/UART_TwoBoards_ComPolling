@@ -1,13 +1,26 @@
-%% function [] = get_EOm1DOF()
+%% function [torque] = get_EOmDOF()
 %
 %%
 
-function [] = get_EOM()
+function [torque] = get_EOM(DOF)
 
 clc
 close all
+
+OneDOF = 0;
+TwoDOF = 0;
+ThreeDOF = 0;
 verbose = 1;
 
+if(DOF == 1)
+    OneDOF = 1;
+end
+if(DOF == 2)
+    TwoDOF = 1;
+end
+if(DOF == 3)
+    ThreeDOF = 1;
+end
 signpost(verbose,'Start: get_EOM()')
 
 %% Initialise variables
@@ -52,9 +65,7 @@ it3 = 3;
 
 C = [0*temp 0*temp 0*temp; 0*temp 0*temp 0*temp; 0*temp 0*temp 0*temp];
 
-OneDOF = 0;
-TwoDOF = 0;
-ThreeDOF = 1;
+
 
 if(ThreeDOF)
     N = 3;
@@ -277,11 +288,8 @@ for i = 1:N
     
     torque(i) = simplify(torque(i));
 end
-
-
 p(torque)
-
-
-
 signpost(verbose,'Done: get_EOM()')
+
+end
 
