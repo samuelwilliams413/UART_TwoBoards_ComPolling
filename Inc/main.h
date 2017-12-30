@@ -72,25 +72,6 @@
 
 
 
-/* Definition for ADCx clock resources */
-#define ADCy                            ADC1
-#define ADCy_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
-#define ADCy_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
-
-#define DMAy_l_CHANNELx_CLK_ENABLE()      __HAL_RCC_DMA1_CLK_ENABLE()
-#define DMAy_r_CHANNELx_CLK_ENABLE()      __HAL_RCC_DMA2_CLK_ENABLE()
-
-#define ADCy_FORCE_RESET()              __HAL_RCC_ADC12_FORCE_RESET()
-#define ADCy_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
-
-/* Definition for ADCx Channel Pin */
-#define ADCy_CHANNEL_PIN_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-
-#define ADCy_CHANNEL_GPIO_PORT          GPIOA
-
-
-#define getADCy()						ADCy
-
 /* Definition for USARTx clock resources */
 #define USARTx                           USART1
 #define USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE()
