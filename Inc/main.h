@@ -47,7 +47,6 @@
    resources */
 
 /* Definition for ADCx clock resources */
-#define ADCy                            ADC1
 #define ADCx                            ADC2
 #define ADCx_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
 #define ADCx_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
