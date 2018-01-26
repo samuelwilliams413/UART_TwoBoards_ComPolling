@@ -398,7 +398,7 @@ int main(void) {
 			case 3:
 				sprintf( confirmBuffer, ">>>A6\n\r");
 				XorY = 0; // X
-				flicker = 0;
+				flicker = 4;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_d) != HAL_OK) {
 					Error_Handler();
 				}
@@ -465,9 +465,9 @@ int main(void) {
 					}
 				}
 		if (XorY == 1) {
-					if (HAL_ADC_PollForConversion(&AdcHandle, 1000000) == HAL_OK) {
+					if (HAL_ADC_PollForConversion(&AdcHandley, 1000000) == HAL_OK) {
 						last_ADCValue = ADCValue;
-						ADCValue = HAL_ADC_GetValue(&AdcHandle);
+						ADCValue = HAL_ADC_GetValue(&AdcHandley);
 
 						moving_average[index_measure] = ADCValue;
 
