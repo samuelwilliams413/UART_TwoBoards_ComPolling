@@ -56,6 +56,8 @@
 /* Private define ------------------------------------------------------------*/
 //#define TRANSMITTER_BOARD
 /* Definition of ADCx conversions data table size */
+#define ADCy                            ADC1
+
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  32)   /* Size of array */
 
 
@@ -87,6 +89,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* ADC handle declaration */
 ADC_HandleTypeDef AdcHandle;
+ADC_HandleTypeDef AdcHandley;
 
 /* ADC channel configuration structure declaration */
 ADC_ChannelConfTypeDef sConfig_a;
@@ -128,6 +131,7 @@ int main(void) {
 	uint8_t* confirmBuffer = (uint8_t*) malloc (sizeof(uint8_t)*100);
 	memset(confirmBuffer, 0, 100);
 	int flicker = 0;
+	int XorY = 0;
 	int i = 0;
 	GPIO_InitTypeDef GPIO_InitStruct;
 	/* STM32F3xx HAL library initialization:
@@ -208,6 +212,32 @@ int main(void) {
 		Error_Handler();
 	}
 
+	/* ### - 1 - Initialize ADC peripheral #################################### */
+	AdcHandley.Instance = ADCy;
+	if (HAL_ADC_DeInit(&AdcHandley) != HAL_OK) {
+		/* ADC de-initialization Error */
+		Error_Handler();
+	}
+
+	AdcHandley.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2; /* Synchronous clock mode, input ADC clock divided by 2*/
+	AdcHandley.Init.Resolution = ADC_RESOLUTION_12B; /* 12-bit resolution for converted data */
+	AdcHandley.Init.DataAlign = ADC_DATAALIGN_RIGHT; /* Right-alignment for converted data */
+	AdcHandley.Init.ScanConvMode = DISABLE; /* Sequencer disabled (ADC conversion on only 1 channel: channel set on rank 1) */
+	AdcHandley.Init.EOCSelection = ADC_EOC_SINGLE_CONV; /* EOC flag picked-up to indicate conversion end */
+	AdcHandley.Init.LowPowerAutoWait = DISABLE; /* Auto-delayed conversion feature disabled */
+	AdcHandley.Init.ContinuousConvMode = ENABLE; /* Continuous mode enabled (automatic conversion restart after each conversion) */
+	AdcHandley.Init.NbrOfConversion = 1; /* Parameter discarded because sequencer is disabled */
+	AdcHandley.Init.DiscontinuousConvMode = DISABLE; /* Parameter discarded because sequencer is disabled */
+	AdcHandley.Init.NbrOfDiscConversion = 1; /* Parameter discarded because sequencer is disabled */
+	AdcHandley.Init.ExternalTrigConv = ADC_SOFTWARE_START; /* Software start to trig the 1st conversion manually, without external event */
+	AdcHandley.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE; /* Parameter discarded because software trigger chosen */
+	AdcHandley.Init.DMAContinuousRequests = ENABLE; /* ADC DMA continuous request to match with DMA circular mode */
+	AdcHandley.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN; /* DR register is overwritten with the last conversion result in case of overrun */
+	/* Initialize ADC peripheral according to the passed parameters */
+	if (HAL_ADC_Init(&AdcHandley) != HAL_OK) {
+		Error_Handler();
+	}
+
 	/* ### - 2 - Start calibration ############################################ */
 	if (HAL_ADCEx_Calibration_Start(&AdcHandle, ADC_SINGLE_ENDED) != HAL_OK) {
 		Error_Handler();
@@ -262,32 +292,41 @@ int main(void) {
 	}
 
 
+
+
+
 	/* ### - 3 - e Channel configuration ######################################## */
-	sConfig_e.Channel = ADC_CHANNEL_2; /* Sampled channel number */
+	sConfig_e.Channel = ADC_CHANNEL_1; /* Sampled channel number */
 	sConfig_e.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
 	sConfig_e.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
 	sConfig_e.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
 	sConfig_e.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
 	sConfig_e.Offset = 0; /* Parameter discarded because offset correction is disabled */
-	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_e) != HAL_OK) {
+	if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_e) != HAL_OK) {
 		Error_Handler();
 	}
 
 
 	/* ### - 3 - f Channel configuration ######################################## */
-	sConfig_f.Channel = ADC_CHANNEL_1; /* Sampled channel number */
+	sConfig_f.Channel = ADC_CHANNEL_2; /* Sampled channel number */
 	sConfig_f.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
 	sConfig_f.SamplingTime = ADC_SAMPLETIME_61CYCLES_5; /* Sampling time (number of clock cycles unit) */
 	sConfig_f.SingleDiff = ADC_SINGLE_ENDED; /* Single-ended input channel */
 	sConfig_f.OffsetNumber = ADC_OFFSET_NONE; /* No offset subtraction */
 	sConfig_f.Offset = 0; /* Parameter discarded because offset correction is disabled */
-	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_f) != HAL_OK) {
+	if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_f) != HAL_OK) {
 		Error_Handler();
 	}
 
 
 	/* ### - 4 - Start conversion in DMA mode ################################# */
 	if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
+		Error_Handler();
+	}
+
+
+	/* ### - 4 - Start conversion in DMA mode ################################# */
+	if (HAL_ADC_Start(&AdcHandley) != HAL_OK) {
 		Error_Handler();
 	}
 
@@ -311,7 +350,7 @@ int main(void) {
 		/* While the UART in reception process, user can transmit data through
 		 "aTxBuffer" buffer */
 		BSP_LED_Toggle(LED3);
-		HAL_Delay(100);
+		HAL_Delay(150);
 		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
 				1000) != HAL_OK) {
 			Error_Handler();
@@ -327,46 +366,58 @@ int main(void) {
 			if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
 				Error_Handler();
 			}
+			if (HAL_ADC_Stop(&AdcHandley) != HAL_OK) {
+				Error_Handler();
+			}
+
+			flicker = 3;
+
 			switch (flicker) {
 			case 0:
-				sprintf( confirmBuffer, ">>>A\n\r");
-				flicker = 1;
+				sprintf( confirmBuffer, ">>>A (A3)\n\r");
+				XorY = 0; // X
+				flicker = 0;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_a) != HAL_OK) {
 					Error_Handler();
 				}
 				break;
 			case 1:
-				sprintf( confirmBuffer, ">>>B\n\r");
+				sprintf( confirmBuffer, ">>>B (A4)\n\r");
+				XorY = 0; // X
 				flicker = 2;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_b) != HAL_OK) {
 					Error_Handler();
 				}
 				break;
 			case 2:
-				sprintf( confirmBuffer, ">>>C\n\r");
+				sprintf( confirmBuffer, ">>>C (A5)\n\r");
+				XorY = 0; // X
 				flicker = 3;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_c) != HAL_OK) {
 					Error_Handler();
 				}
 				break;
 			case 3:
-				sprintf( confirmBuffer, ">>>D\n\r");
-				flicker = 0;
+				sprintf( confirmBuffer, ">>>D (A6)\n\r");
+				XorY = 0; // X
+				flicker = 4;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_d) != HAL_OK) {
 					Error_Handler();
 				}
 				break;
 			case 4:
-				sprintf( confirmBuffer, ">>>E\n\r");
+				sprintf( confirmBuffer, ">>>E (A1)\n\r");
+				XorY = 1; // Y
 				flicker = 5;
-				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_e) != HAL_OK) {
+				if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_e) != HAL_OK) {
 					Error_Handler();
 				}
 				break;
 			case 5:
-				sprintf( confirmBuffer, ">>>F\n\r");
+				sprintf( confirmBuffer, ">>>F (A2) \n\r");
+				XorY = 1; // Y
 				flicker = 0;
-				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_f) != HAL_OK) {
+				if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_f) != HAL_OK) {
 					Error_Handler();
 				}
 				break;
@@ -376,39 +427,73 @@ int main(void) {
 				Error_Handler();
 			}
 
+			if (HAL_ADC_Start(&AdcHandley) != HAL_OK) {
+				Error_Handler();
+			}
+
 
 			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
 					1000) != HAL_OK) {
 				Error_Handler();
 			}
 		}
+		if (XorY == 1) {
+			if (HAL_ADC_PollForConversion(&AdcHandley, 1000000) == HAL_OK) {
+							last_ADCValue = ADCValue;
+							ADCValue = HAL_ADC_GetValue(&AdcHandley);
 
-		if (HAL_ADC_PollForConversion(&AdcHandle, 1000000) == HAL_OK) {
-			last_ADCValue = ADCValue;
-			ADCValue = HAL_ADC_GetValue(&AdcHandle);
+							moving_average[index_measure] = ADCValue;
 
-			moving_average[index_measure] = ADCValue;
+							number_measure = number_measure + 1;
+							index_measure = index_measure + 1;
+							index_measure = index_measure % 10;
+							if (number_measure > 10) {
+								number_measure = 10;
+							}
 
-			number_measure = number_measure + 1;
-			index_measure = index_measure + 1;
-			index_measure = index_measure % 10;
-			if (number_measure > 10) {
-				number_measure = 10;
+							if (last_ADCValue > ADCValue) {
+								diff_ADCValue = last_ADCValue - ADCValue;
+							} else {
+								diff_ADCValue = ADCValue - last_ADCValue;
+							}
+
+							moving_average_val = moving_average_X(moving_average, number_measure);
+							memset(confirmBuffer, 0, 100);
+
+							X_v = (1/ADCValue)*1732.1 - 22.448;
+							X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
+
+							sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
+						}
+		} else {
+			if (HAL_ADC_PollForConversion(&AdcHandle, 1000000) == HAL_OK) {
+				last_ADCValue = ADCValue;
+				ADCValue = HAL_ADC_GetValue(&AdcHandle);
+
+				moving_average[index_measure] = ADCValue;
+
+				number_measure = number_measure + 1;
+				index_measure = index_measure + 1;
+				index_measure = index_measure % 10;
+				if (number_measure > 10) {
+					number_measure = 10;
+				}
+
+				if (last_ADCValue > ADCValue) {
+					diff_ADCValue = last_ADCValue - ADCValue;
+				} else {
+					diff_ADCValue = ADCValue - last_ADCValue;
+				}
+
+				moving_average_val = moving_average_X(moving_average, number_measure);
+				memset(confirmBuffer, 0, 100);
+
+				X_v = (1/ADCValue)*1732.1 - 22.448;
+				X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
+
+				sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
 			}
 
-			if (last_ADCValue > ADCValue) {
-				diff_ADCValue = last_ADCValue - ADCValue;
-			} else {
-				diff_ADCValue = ADCValue - last_ADCValue;
-			}
-
-			moving_average_val = moving_average_X(moving_average, number_measure);
-			memset(confirmBuffer, 0, 100);
-
-			X_v = (1/ADCValue)*1732.1 - 22.448;
-			X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
-
-			sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
 		}
 
 	}
