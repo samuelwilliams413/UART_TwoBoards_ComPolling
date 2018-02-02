@@ -36,6 +36,17 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#define USARTy_TX_PIN                    GPIO_PIN_2
+#define USARTy_TX_GPIO_PORT              GPIOA
+#define USARTy_TX_AF                     GPIO_AF7_USART2
+#define USARTy_RX_PIN                    GPIO_PIN_3
+#define USARTy_RX_GPIO_PORT              GPIOA
+#define USARTy_RX_AF                     GPIO_AF7_USART2
+#define USARTy_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE()
+#define USARTy_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
+#define USARTy_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
+
+
 /** @addtogroup STM32F3xx_HAL_Examples
   * @{
   */
@@ -65,7 +76,8 @@
   */
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
-  GPIO_InitTypeDef  GPIO_InitStruct;
+	  GPIO_InitTypeDef  GPIO_InitStruct;
+	  GPIO_InitTypeDef  GPIO_InitStructy;
 
   /*##-1- Enable peripherals and GPIO Clocks #################################*/
   /* Enable GPIO TX/RX clock */
@@ -73,8 +85,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   USARTx_RX_GPIO_CLK_ENABLE();
 
 
-  /* Enable USARTx clock */
+
+  /* Enable USART clock */
   USARTx_CLK_ENABLE();
+  USARTy_CLK_ENABLE();
 
   /*##-2- Configure peripheral GPIO ##########################################*/
   /* UART TX GPIO pin configuration  */
@@ -91,6 +105,22 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   GPIO_InitStruct.Alternate = USARTx_RX_AF;
 
   HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+
+  /*##-2- Configure peripheral GPIO y ##########################################*/
+  /* UART TX GPIO pin configuration  */
+  GPIO_InitStructy.Pin       = USARTy_TX_PIN;
+  GPIO_InitStructy.Mode      = GPIO_MODE_AF_PP;
+  GPIO_InitStructy.Pull      = GPIO_PULLUP;
+  GPIO_InitStructy.Speed     = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStructy.Alternate = USARTy_TX_AF;
+
+  HAL_GPIO_Init(USARTy_TX_GPIO_PORT, &GPIO_InitStructy);
+
+  /* UART RX GPIO pin configuration  */
+  GPIO_InitStructy.Pin = USARTy_RX_PIN;
+  GPIO_InitStructy.Alternate = USARTy_RX_AF;
+
+  HAL_GPIO_Init(USARTy_RX_GPIO_PORT, &GPIO_InitStructy);
 }
 
 /**

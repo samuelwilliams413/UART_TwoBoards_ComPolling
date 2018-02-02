@@ -53,6 +53,10 @@
  */
 
 /* Private typedef -----------------------------------------------------------*/
+
+#define USARTy                           USART2
+
+
 /* Private define ------------------------------------------------------------*/
 //#define TRANSMITTER_BOARD
 /* Definition of ADCx conversions data table size */
@@ -99,6 +103,7 @@ static uint16_t aADCx_rightConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
 uint32_t moving_average_X(uint32_t*, int);
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
+UART_HandleTypeDef UartHandley;
 __IO uint32_t VirtualUserButtonStatus = 0; /* set to 1 after User set a button  */
 
 /* Buffer used for transmission */
@@ -173,9 +178,31 @@ int main(void) {
 	UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
 	UartHandle.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
+	UartHandley.Instance = USARTy;
+
+	UartHandley.Init.BaudRate = 9600;
+	UartHandley.Init.WordLength = UART_WORDLENGTH_8B;
+	UartHandley.Init.StopBits = UART_STOPBITS_1;
+	UartHandley.Init.Parity = UART_PARITY_NONE;
+	UartHandley.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	UartHandley.Init.Mode = UART_MODE_TX_RX;
+	UartHandley.Init.OverSampling = UART_OVERSAMPLING_16;
+	UartHandley.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+
+
 	if (HAL_UART_DeInit(&UartHandle) != HAL_OK) {
 		Error_Handler();
 	}
+
+	if (HAL_UART_DeInit(&UartHandle) != HAL_OK) {
+		Error_Handler();
+	}
+
+
+	if (HAL_UART_Init(&UartHandley) != HAL_OK) {
+		Error_Handler();
+	}
+
 	if (HAL_UART_Init(&UartHandle) != HAL_OK) {
 		Error_Handler();
 	}
@@ -339,6 +366,10 @@ int main(void) {
 			BSP_LED_Toggle(LED3);
 			HAL_Delay(200);
 			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
+					TXBUFFERSIZE, 1000) != HAL_OK) {
+				Error_Handler();
+			}
+			if (HAL_UART_Transmit(&UartHandley, (uint8_t*) confirmBuffer,
 					TXBUFFERSIZE, 1000) != HAL_OK) {
 				Error_Handler();
 			}
