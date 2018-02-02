@@ -59,30 +59,25 @@
 #define ADCy                            ADC1
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  32)   /* Size of array */
 
-
 #define BRD_D6_PIN						GPIO_PIN_15
 #define BRD_D7_PIN						GPIO_PIN_2
 #define BRD_D8_PIN						GPIO_PIN_3
 #define BRD_D9_PIN						GPIO_PIN_18
-
 
 #define D6_GPIO_PORT                     GPIOB
 #define D7_GPIO_PORT                     GPIOF
 #define D8_GPIO_PORT                     GPIOF
 #define D9_GPIO_PORT                     GPIOA
 
-
 #define D6_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOB_CLK_ENABLE()
 #define D7_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOF_CLK_ENABLE()
 #define D8_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOF_CLK_ENABLE()
 #define D9_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOA_CLK_ENABLE()
 
-
 #define D6_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOB_CLK_DISABLE()
 #define D7_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOF_CLK_DISABLE()
 #define D8_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOF_CLK_DISABLE()
 #define D9_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOA_CLK_DISABLE()
-
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -101,7 +96,7 @@ ADC_ChannelConfTypeDef sConfig_f;
 /* Variable containing ADC conversions data */
 static uint16_t aADCx_leftConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
 static uint16_t aADCx_rightConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
-uint32_t moving_average_X( uint32_t*, int);
+uint32_t moving_average_X(uint32_t*, int);
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
 __IO uint32_t VirtualUserButtonStatus = 0; /* set to 1 after User set a button  */
@@ -127,7 +122,7 @@ static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2,
  */
 int main(void) {
 
-	uint8_t* confirmBuffer = (uint8_t*) malloc (sizeof(uint8_t)*100);
+	uint8_t* confirmBuffer = (uint8_t*) malloc(sizeof(uint8_t) * 100);
 	memset(confirmBuffer, 0, 100);
 	int flicker = 0;
 	int i = 0;
@@ -147,17 +142,17 @@ int main(void) {
 	/* Configure LED3 */
 	BSP_LED_Init(LED3);
 
-
 	/* Enable the GPIO clocks */
 
-		/* GPIO pins as outputs */
-		GPIO_InitStruct.Pin = BRD_D6_PIN;				//Pin
-		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;		//Output Mode
-		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;;			//Pin latency
-		HAL_GPIO_Init(D6_GPIO_PORT, &GPIO_InitStruct);
+	/* GPIO pins as outputs */
+	GPIO_InitStruct.Pin = BRD_D6_PIN;				//Pin
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;		//Output Mode
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	;			//Pin latency
+	HAL_GPIO_Init(D6_GPIO_PORT, &GPIO_InitStruct);
 
-		HAL_GPIO_WritePin(D6_GPIO_PORT, BRD_D6_PIN, 0x00);
+	HAL_GPIO_WritePin(D6_GPIO_PORT, BRD_D6_PIN, 0x00);
 
 	/*##-1- Configure the UART peripheral ######################################*/
 	/* Put the USART peripheral in the Asynchronous mode (UART Mode) */
@@ -247,7 +242,6 @@ int main(void) {
 		Error_Handler();
 	}
 
-
 	/* ### - 3 - a Channel configuration ######################################## */
 	sConfig_a.Channel = ADC_CHANNEL_1; /* Sampled channel number */
 	sConfig_a.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
@@ -258,7 +252,6 @@ int main(void) {
 	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_a) != HAL_OK) {
 		Error_Handler();
 	}
-
 
 	/* ### - 3 - b Channel configuration ######################################## */
 	sConfig_b.Channel = ADC_CHANNEL_2; /* Sampled channel number */
@@ -271,7 +264,6 @@ int main(void) {
 		Error_Handler();
 	}
 
-
 	/* ### - 3 - c Channel configuration ######################################## */
 	sConfig_c.Channel = ADC_CHANNEL_3; /* Sampled channel number */
 	sConfig_c.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
@@ -282,7 +274,6 @@ int main(void) {
 	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_c) != HAL_OK) {
 		Error_Handler();
 	}
-
 
 	/* ### - 3 - d Channel configuration ######################################## */
 	sConfig_d.Channel = ADC_CHANNEL_4; /* Sampled channel number */
@@ -295,7 +286,6 @@ int main(void) {
 		Error_Handler();
 	}
 
-
 	/* ### - 3 - e Channel configuration ######################################## */
 	sConfig_e.Channel = ADC_CHANNEL_1; /* Sampled channel number */
 	sConfig_e.Rank = ADC_REGULAR_RANK_1; /* Rank of sampled channel number ADCx_left_CHANNEL */
@@ -306,7 +296,6 @@ int main(void) {
 	if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_e) != HAL_OK) {
 		Error_Handler();
 	}
-
 
 	/* ### - 3 - f Channel configuration ######################################## */
 	sConfig_f.Channel = ADC_CHANNEL_2; /* Sampled channel number */
@@ -319,12 +308,10 @@ int main(void) {
 		Error_Handler();
 	}
 
-
 	/* ### - 4 - Start conversion in DMA mode ################################# */
 	if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
 		Error_Handler();
 	}
-
 
 	/* ### - 4 - Start conversion in DMA mode ################################# */
 	if (HAL_ADC_Start(&AdcHandley) != HAL_OK) {
@@ -337,23 +324,36 @@ int main(void) {
 	uint32_t X_v;
 
 	uint32_t moving_average_val;
-	uint32_t* moving_average = (uint32_t*)malloc(sizeof(uint32_t) * 10);
+	uint32_t* moving_average = (uint32_t*) malloc(sizeof(uint32_t) * 10);
 	int number_measure = 0;
 	int index_measure = 0;
 
 	memset(confirmBuffer, 0, 100);
 
-	sprintf( confirmBuffer, "********* BOOT COMPLETED *********\n\r");
+	sprintf(confirmBuffer, "********* BOOT COMPLETED *********\n\r");
 
 	flicker = 0;
 	while (1) {
+
+		while (1) {
+			BSP_LED_Toggle(LED3);
+			HAL_Delay(200);
+			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
+					TXBUFFERSIZE, 1000) != HAL_OK) {
+				Error_Handler();
+			}
+			memset(confirmBuffer, 0, 100);
+			sprintf(confirmBuffer, "UART CHANNEL %u\n\r", flicker);
+			flicker = ((flicker+1)%2);
+		}
+
 		/*##-3- Start the transmission process #####################################*/
 		/* While the UART in reception process, user can transmit data through
 		 "aTxBuffer" buffer */
 		BSP_LED_Toggle(LED3);
 		HAL_Delay(100);
-		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
-				1000) != HAL_OK) {
+		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
+				TXBUFFERSIZE, 1000) != HAL_OK) {
 			Error_Handler();
 		}
 
@@ -361,7 +361,7 @@ int main(void) {
 			memset(confirmBuffer, 0, 100);
 			number_measure = 0;
 
-			for(i = 0; i < 10; i++) {
+			for (i = 0; i < 10; i++) {
 				moving_average[i] = 0;
 			}
 			if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
@@ -372,7 +372,7 @@ int main(void) {
 			}
 			switch (flicker) {
 			case 0:
-				sprintf( confirmBuffer, ">>>A3\n\r");
+				sprintf(confirmBuffer, ">>>A3\n\r");
 				XorY = 0; // X
 				flicker = 1;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_a) != HAL_OK) {
@@ -380,7 +380,7 @@ int main(void) {
 				}
 				break;
 			case 1:
-				sprintf( confirmBuffer, ">>>A4\n\r");
+				sprintf(confirmBuffer, ">>>A4\n\r");
 				XorY = 0; // X
 				flicker = 2;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_b) != HAL_OK) {
@@ -388,7 +388,7 @@ int main(void) {
 				}
 				break;
 			case 2:
-				sprintf( confirmBuffer, ">>>A5\n\r");
+				sprintf(confirmBuffer, ">>>A5\n\r");
 				XorY = 0; // X
 				flicker = 3;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_c) != HAL_OK) {
@@ -396,7 +396,7 @@ int main(void) {
 				}
 				break;
 			case 3:
-				sprintf( confirmBuffer, ">>>A6\n\r");
+				sprintf(confirmBuffer, ">>>A6\n\r");
 				XorY = 0; // X
 				flicker = 4;
 				if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig_d) != HAL_OK) {
@@ -404,7 +404,7 @@ int main(void) {
 				}
 				break;
 			case 4:
-				sprintf( confirmBuffer, ">>>A0\n\r");
+				sprintf(confirmBuffer, ">>>A0\n\r");
 				XorY = 1; // Y
 				flicker = 5;
 				if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_e) != HAL_OK) {
@@ -412,7 +412,7 @@ int main(void) {
 				}
 				break;
 			case 5:
-				sprintf( confirmBuffer, ">>>A1\n\r");
+				sprintf(confirmBuffer, ">>>A1\n\r");
 				XorY = 1; // Y
 				flicker = 0;
 				if (HAL_ADC_ConfigChannel(&AdcHandley, &sConfig_f) != HAL_OK) {
@@ -429,76 +429,82 @@ int main(void) {
 				Error_Handler();
 			}
 
-
-			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer, TXBUFFERSIZE,
-					1000) != HAL_OK) {
+			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
+					TXBUFFERSIZE, 1000) != HAL_OK) {
 				Error_Handler();
 			}
 		}
 		if (XorY == 0) {
-					if (HAL_ADC_PollForConversion(&AdcHandle, 1000000) == HAL_OK) {
-						last_ADCValue = ADCValue;
-						ADCValue = HAL_ADC_GetValue(&AdcHandle);
+			if (HAL_ADC_PollForConversion(&AdcHandle, 1000000) == HAL_OK) {
+				last_ADCValue = ADCValue;
+				ADCValue = HAL_ADC_GetValue(&AdcHandle);
 
-						moving_average[index_measure] = ADCValue;
+				moving_average[index_measure] = ADCValue;
 
-						number_measure = number_measure + 1;
-						index_measure = index_measure + 1;
-						index_measure = index_measure % 10;
-						if (number_measure > 10) {
-							number_measure = 10;
-						}
-
-						if (last_ADCValue > ADCValue) {
-							diff_ADCValue = last_ADCValue - ADCValue;
-						} else {
-							diff_ADCValue = ADCValue - last_ADCValue;
-						}
-
-						moving_average_val = moving_average_X(moving_average, number_measure);
-						memset(confirmBuffer, 0, 100);
-
-						X_v = (1/ADCValue)*1732.1 - 22.448;
-						X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
-
-						sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
-					}
+				number_measure = number_measure + 1;
+				index_measure = index_measure + 1;
+				index_measure = index_measure % 10;
+				if (number_measure > 10) {
+					number_measure = 10;
 				}
+
+				if (last_ADCValue > ADCValue) {
+					diff_ADCValue = last_ADCValue - ADCValue;
+				} else {
+					diff_ADCValue = ADCValue - last_ADCValue;
+				}
+
+				moving_average_val = moving_average_X(moving_average,
+						number_measure);
+				memset(confirmBuffer, 0, 100);
+
+				X_v = (1 / ADCValue) * 1732.1 - 22.448;
+				X_v = ((1 * 1000000) / (sqrt(1000000 * ADCValue)) * 1732.1
+						- 22.448 * 1000) / 1000;
+
+				sprintf(confirmBuffer,
+						"Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v,
+						ADCValue, moving_average_val, diff_ADCValue);
+			}
+		}
 		if (XorY == 1) {
-					if (HAL_ADC_PollForConversion(&AdcHandley, 1000000) == HAL_OK) {
-						last_ADCValue = ADCValue;
-						ADCValue = HAL_ADC_GetValue(&AdcHandley);
+			if (HAL_ADC_PollForConversion(&AdcHandley, 1000000) == HAL_OK) {
+				last_ADCValue = ADCValue;
+				ADCValue = HAL_ADC_GetValue(&AdcHandley);
 
-						moving_average[index_measure] = ADCValue;
+				moving_average[index_measure] = ADCValue;
 
-						number_measure = number_measure + 1;
-						index_measure = index_measure + 1;
-						index_measure = index_measure % 10;
-						if (number_measure > 10) {
-							number_measure = 10;
-						}
-
-						if (last_ADCValue > ADCValue) {
-							diff_ADCValue = last_ADCValue - ADCValue;
-						} else {
-							diff_ADCValue = ADCValue - last_ADCValue;
-						}
-
-						moving_average_val = moving_average_X(moving_average, number_measure);
-						memset(confirmBuffer, 0, 100);
-
-						X_v = (1/ADCValue)*1732.1 - 22.448;
-						X_v = ((1*1000000)/(sqrt(1000000*ADCValue))*1732.1 - 22.448*1000)/1000;
-
-						sprintf( confirmBuffer, "Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v, ADCValue, moving_average_val, diff_ADCValue);
-					}
+				number_measure = number_measure + 1;
+				index_measure = index_measure + 1;
+				index_measure = index_measure % 10;
+				if (number_measure > 10) {
+					number_measure = 10;
 				}
+
+				if (last_ADCValue > ADCValue) {
+					diff_ADCValue = last_ADCValue - ADCValue;
+				} else {
+					diff_ADCValue = ADCValue - last_ADCValue;
+				}
+
+				moving_average_val = moving_average_X(moving_average,
+						number_measure);
+				memset(confirmBuffer, 0, 100);
+
+				X_v = (1 / ADCValue) * 1732.1 - 22.448;
+				X_v = ((1 * 1000000) / (sqrt(1000000 * ADCValue)) * 1732.1
+						- 22.448 * 1000) / 1000;
+
+				sprintf(confirmBuffer,
+						"Distance : %u mm\t\t(V:%u\tA:%u\tD:%u)\n\r", X_v,
+						ADCValue, moving_average_val, diff_ADCValue);
+			}
+		}
 
 	}
 }
 
-
-uint32_t moving_average_X( uint32_t* moving_average, int X) {
+uint32_t moving_average_X(uint32_t* moving_average, int X) {
 	uint32_t moving_average_val = 0;
 
 	int i = 0;
@@ -508,7 +514,6 @@ uint32_t moving_average_X( uint32_t* moving_average, int X) {
 	}
 	moving_average_val = moving_average_val / X;
 	return moving_average_val;
-
 
 }
 
