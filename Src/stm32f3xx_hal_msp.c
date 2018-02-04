@@ -134,14 +134,16 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
   /*##-1- Reset peripherals ##################################################*/
-  USARTx_FORCE_RESET();
-  USARTx_RELEASE_RESET();
+	  USARTx_FORCE_RESET();
+	  USARTx_RELEASE_RESET();
 
   /*##-2- Disable peripherals and GPIO Clocks #################################*/
   /* Configure USART1 Tx as alternate function  */
-  HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
+	  HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
+	  HAL_GPIO_DeInit(USARTy_TX_GPIO_PORT, USARTy_TX_PIN);
   /* Configure USART1 Rx as alternate function  */
-  HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
+	  HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
+	  HAL_GPIO_DeInit(USARTy_RX_GPIO_PORT, USARTy_RX_PIN);
 }
 
 

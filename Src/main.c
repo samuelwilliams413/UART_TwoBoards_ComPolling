@@ -56,7 +56,6 @@
 
 #define USARTy                           USART2
 
-
 /* Private define ------------------------------------------------------------*/
 //#define TRANSMITTER_BOARD
 /* Definition of ADCx conversions data table size */
@@ -110,6 +109,7 @@ __IO uint32_t VirtualUserButtonStatus = 0; /* set to 1 after User set a button  
 uint8_t aTxBuffer[] = "                                                  \n\r";
 
 /* Buffer used for reception */
+#define RXBUFFERSIZE                      (COUNTOF(aTxBuffer) - 1)
 uint8_t aRxBuffer[RXBUFFERSIZE];
 
 /* Private function prototypes -----------------------------------------------*/
@@ -126,7 +126,7 @@ static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2,
  * @retval None
  */
 int main(void) {
-
+	HAL_StatusTypeDef status;
 	uint8_t* confirmBuffer = (uint8_t*) malloc(sizeof(uint8_t) * 100);
 	memset(confirmBuffer, 0, 100);
 	int flicker = 0;
@@ -189,7 +189,6 @@ int main(void) {
 	UartHandley.Init.OverSampling = UART_OVERSAMPLING_16;
 	UartHandley.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
-
 	if (HAL_UART_DeInit(&UartHandle) != HAL_OK) {
 		Error_Handler();
 	}
@@ -197,7 +196,6 @@ int main(void) {
 	if (HAL_UART_DeInit(&UartHandle) != HAL_OK) {
 		Error_Handler();
 	}
-
 
 	if (HAL_UART_Init(&UartHandley) != HAL_OK) {
 		Error_Handler();
@@ -360,22 +358,54 @@ int main(void) {
 	sprintf(confirmBuffer, "********* BOOT COMPLETED *********\n\r");
 
 	flicker = 0;
+	int test = 1;
 	while (1) {
+		BSP_LED_Off(LED3);
 
 		while (1) {
-			BSP_LED_Toggle(LED3);
+			//BSP_LED_Toggle(LED3);
+			memset(aRxBuffer, 0, RXBUFFERSIZE);
 			HAL_Delay(200);
-			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
-					TXBUFFERSIZE, 1000) != HAL_OK) {
-				Error_Handler();
-			}
-			if (HAL_UART_Transmit(&UartHandley, (uint8_t*) confirmBuffer,
-					TXBUFFERSIZE, 1000) != HAL_OK) {
-				Error_Handler();
+
+
+
+
+			if ((flicker%2)) { // UART 1
+				if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
+				TXBUFFERSIZE, 1000) != HAL_OK) {
+					Error_Handler();
+				}
+			} else { // UART 2
+				//
+				BSP_LED_On(LED3);
+				if(test) {
+					memset(aRxBuffer, 0, RXBUFFERSIZE);
+					__HAL_UART_CLEAR_IT(&UartHandley, UART_CLEAR_NEF|UART_CLEAR_OREF);
+					__HAL_UART_CLEAR_IT(&UartHandle, UART_CLEAR_NEF|UART_CLEAR_OREF);
+					status = HAL_UART_Receive(&UartHandle, (uint8_t*) aRxBuffer, RXBUFFERSIZE, 1000);
+					if (status != HAL_TIMEOUT) {
+						Error_Handler();
+						if (status == HAL_OK) {
+							memset(confirmBuffer, 0, 100);
+							sprintf(confirmBuffer, "EVERYTHING IS OK%u\n\r", flicker);
+						} else {
+							Error_Handler();
+						}
+					} else {
+
+						memset(confirmBuffer, 0, 100);
+						sprintf(confirmBuffer, "********* TIMEOUT *********%u\n\r", flicker);
+					}
+				}
+				BSP_LED_Off(LED3);
+				if (HAL_UART_Transmit(&UartHandley, (uint8_t*) confirmBuffer,
+				TXBUFFERSIZE, 1000) != HAL_OK) {
+					Error_Handler();
+				}
 			}
 			memset(confirmBuffer, 0, 100);
-			sprintf(confirmBuffer, "UART CHANNEL %u\n\r", flicker);
-			flicker = ((flicker+1)%2);
+			sprintf(confirmBuffer, "> UART CHANNEL %u\n\r", (flicker+1));
+			flicker = ((flicker + 1) % 4);
 		}
 
 		/*##-3- Start the transmission process #####################################*/
@@ -384,7 +414,7 @@ int main(void) {
 		BSP_LED_Toggle(LED3);
 		HAL_Delay(100);
 		if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
-				TXBUFFERSIZE, 1000) != HAL_OK) {
+		TXBUFFERSIZE, 1000) != HAL_OK) {
 			Error_Handler();
 		}
 
@@ -461,7 +491,7 @@ int main(void) {
 			}
 
 			if (HAL_UART_Transmit(&UartHandle, (uint8_t*) confirmBuffer,
-					TXBUFFERSIZE, 1000) != HAL_OK) {
+			TXBUFFERSIZE, 1000) != HAL_OK) {
 				Error_Handler();
 			}
 		}
@@ -643,7 +673,7 @@ static void Error_Handler(void) {
 	while (1) {
 		/* Error if LED3 is slowly blinking (1 sec. period) */
 		BSP_LED_Toggle(LED3);
-		HAL_Delay(1000);
+		HAL_Delay(50);
 	}
 }
 
